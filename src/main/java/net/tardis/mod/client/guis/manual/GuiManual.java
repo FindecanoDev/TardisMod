@@ -1,5 +1,7 @@
 package net.tardis.mod.client.guis.manual;
 
+import java.io.IOException;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -13,8 +15,12 @@ import net.tardis.mod.Tardis;
 public class GuiManual extends GuiScreen {
 	public static final ResourceLocation TEXTURE = new ResourceLocation(Tardis.MODID, "textures/gui/manual.png");
 	private static final ResourceLocation BOOK_GUI_TEXTURES = new ResourceLocation("textures/gui/book.png");
+	//private static ManualPage[] pages = new ManualPage[]{};
 	private static ScaledResolution res;
+	private GuiButton nextPage;
+	private GuiButton previousPage;
 	public int gui_width = 281, gui_height = 208;
+	private static int current_page = 0;
 	Minecraft mc;
 
 	public GuiManual() {
@@ -22,23 +28,60 @@ public class GuiManual extends GuiScreen {
 		res = new ScaledResolution(mc);
 	}
 
-	//TODO: Nobody touch anything, I have an idea - Jake
-
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		int posX = (res.getScaledWidth() - gui_width) / 2;
+		int posY = (res.getScaledHeight() - gui_height) / 2;
 		GlStateManager.pushMatrix();
 		mc.getTextureManager().bindTexture(TEXTURE);
-		drawModalRectWithCustomSizedTexture(res.getScaledWidth() / 2 - gui_width / 2, res.getScaledHeight() / 2 - gui_height / 2, 0, 0, gui_width, gui_height, 512, 512);
+		drawModalRectWithCustomSizedTexture(posX, posY, 0, 0, gui_width, gui_height, 512, 512);
+		
+		/**int i = 17;
+		int j = 64;
+		for (String s : pages[current_page].getContents()) {
+			this.drawCenteredString(this.fontRenderer, s, posX + j, posY + i, 0x000000);
+			i += this.fontRenderer.FONT_HEIGHT;
+			if(i > 208) {
+				i = 17;
+				j = 200;
+			}
+		}**/
+		
 		GlStateManager.popMatrix();
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
+	
 
 	@Override
 	public void initGui() {
-
-		buttonList.add(new NextPageButton(1, (this.width - gui_width) / 2 + 235, res.getScaledHeight() / 2 + gui_height / 4, true));
-		buttonList.add(new NextPageButton(2, (this.width - gui_width) / 2 + 25, res.getScaledHeight() / 2 + gui_height / 4, false));
+		this.buttonList.clear();
+		this.nextPage = new NextPageButton(0, (this.width - gui_width) / 2 + 235, res.getScaledHeight() / 2 + gui_height / 4, true);
+		buttonList.add(this.nextPage);
+		this.previousPage = new NextPageButton(1, (this.width - gui_width) / 2 + 25, res.getScaledHeight() / 2 + gui_height / 4, false);
+		buttonList.add(this.previousPage);
+		this.previousPage.visible = true;
 		super.initGui();
+	}
+	
+	@Override
+	protected void actionPerformed(GuiButton button) throws IOException {
+		if(button == this.nextPage) {
+			this.current_page ++;
+		} else {
+			this.current_page --;
+		}
+		/*if(this.current_page > 0) {
+			this.previousPage.visible = true;
+		} else {
+			this.previousPage.visible = false;
+		}
+		if(this.current_page == this.pages.length) {
+			this.nextPage.visible = false;
+		} else {
+			this.nextPage.visible = true;
+		} */
+		System.out.println(this.current_page);
+		super.actionPerformed(button);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -50,9 +93,7 @@ public class GuiManual extends GuiScreen {
 			this.isForward = isForwardIn;
 		}
 
-		/**
-		 * Draws this button to the screen.
-		 */
+		/** Stolen from minecraft's book GUI**/
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 			if (this.visible) {
 				boolean flag = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
