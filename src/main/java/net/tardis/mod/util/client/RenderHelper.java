@@ -104,8 +104,8 @@ public class RenderHelper {
 				GlStateManager.popMatrix();
 
 				RenderHelper.setRenderGlobalWorld(oldW);
-				old.bindFramebuffer(true);
 				fb.deleteFramebuffer();
+				old.bindFramebuffer(true);
 
 			} catch (Exception e) {
 				e.printStackTrace();
